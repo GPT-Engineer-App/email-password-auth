@@ -12,17 +12,40 @@ const Index = () => {
     setIsLogin(!isLogin);
   };
 
-  const handleSubmit = () => {
-    toast({
-      title: isLogin ? "Login Successful" : "Registration Successful",
-      description: `Welcome ${email}`,
-      status: "success",
-      duration: 5000,
-      isClosable: true,
+  const handleSubmit = async () => {
+    const url = `https://mnwefvnykbgyhbdzpleh.supabase.co/auth/v1/${isLogin ? "token?grant_type=password" : "signup"}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ud2Vmdm55a2JneWhiZHpwbGVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMyNzQ3MzQsImV4cCI6MjAyODg1MDczNH0.tnHysd1LqayzpQ1L-PImcvlkUmkNvocpMS7tS-hYZNg",
+        Authorization: "Bearer anonymous",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
     });
-    // Reset form
-    setEmail("");
-    setPassword("");
+    const data = await response.json();
+    if (response.ok) {
+      toast({
+        title: isLogin ? "Login Successful" : "Registration Successful",
+        description: `Welcome ${email}`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      setEmail("");
+      setPassword("");
+    } else {
+      toast({
+        title: "Error",
+        description: data.error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
